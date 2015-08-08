@@ -1,0 +1,1 @@
+This is neo. He is a virtual assistant who strives to help everyone. He was made using wolfram alpha api and uses google speech recognition. To know more about wolfram alpha please visit this link: www.wolframalpha.com/
