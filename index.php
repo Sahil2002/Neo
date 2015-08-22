@@ -9,7 +9,11 @@ include 'PHP_Binding_0_1/wa_wrapper/WolframAlphaEngine.php';
 
   <script src="http://maps.google.com/maps/api/js?sensor=true"></script>
   <script src="js/gmaps.js"></script>
-
+  <script>
+  var sendEmail = function(){
+    window.open("mailto:test@example.com");
+  };
+  </script>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -40,7 +44,7 @@ include 'PHP_Binding_0_1/wa_wrapper/WolframAlphaEngine.php';
 
 </head>
 
-<body id="page-top" data-spy="scroll" data-target=".navbar-fixed-top">
+<body id="page-top" data-spy="scroll" data-target=".navbar-fixed-top" onLoad="setToday()">
 
 
   <!-- Navigation -->
@@ -82,10 +86,10 @@ include 'PHP_Binding_0_1/wa_wrapper/WolframAlphaEngine.php';
         <div class="row">
           <div class="col-md-8 col-md-offset-2">
             <h1 class="brand-heading">Neo</h1>
-            <h1>The Virtual Assistant</h1>
+            <h1>The Multitasking Assistant</h1>
             <div id=tb>
               <form method='POST' action='#'>
-                <input type="text" name="q" id="interim_span" placeholder="What can I do for you?" value="
+                <input type="text" name="q" id="interim_span" placeholder="Ask me anything!" value="
                 <?php
                 $queryIsSet = isset($_REQUEST['q']);
                 if ($queryIsSet) {
@@ -245,107 +249,143 @@ include 'PHP_Binding_0_1/wa_wrapper/WolframAlphaEngine.php';
                       </div>
                     </div>
                     <div class="sidebyside">
-                      <button id="email_button" class="button" onclick="emailButton()">
-                        Create Email</button>
-                        <div id="email_info" class="info">
-                        </div>
+                      <!-- <button id="email_button" class="button" onclick="emailButton()">
+                      Create Email</button> -->
+                      <div id="email_info" class="info">
                       </div>
-                      <p>
-                      </div>
+                    </div>
+                    <p>
+                    </div>
+                    <br>
+                    <br>
+                    <br>
+                    <canvas id="canvas" width="200" height="200" style="background-color:#333">
+                    </canvas>
+                    <style>
+                    #canvas {
+                      position: absolute;
+                      top: 10px;
+                      left: 15px;
+                    }
+                    </style>
+                    <script>
+                    var canvas = document.getElementById("canvas");
+                    var ctx = canvas.getContext("2d");
+                    var radius = canvas.height / 2;
+                    ctx.translate(radius, radius);
+                    radius = radius * 0.90
+                    setInterval(drawClock, 1000);
 
-                      <div id="location">
-                      </div>
-                      <div id="results"></div>
-                      <br>
-                      <br>
-                      <h3 id="map_description">Here is the current time:-</h3>
-                      <br>
-                      <canvas id="canvas" width="400" height="400" style="background-color:#333">
-                      </canvas>
-                      <script>
-                      var canvas = document.getElementById("canvas");
-                      var ctx = canvas.getContext("2d");
-                      var radius = canvas.height / 2;
-                      ctx.translate(radius, radius);
-                      radius = radius * 0.90
-                      setInterval(drawClock, 1000);
+                    function drawClock() {
+                      drawFace(ctx, radius);
+                      drawNumbers(ctx, radius);
+                      drawTime(ctx, radius);
+                    }
 
-                      function drawClock() {
-                        drawFace(ctx, radius);
-                        drawNumbers(ctx, radius);
-                        drawTime(ctx, radius);
+                    function drawFace(ctx, radius) {
+                      var grad;
+                      ctx.beginPath();
+                      ctx.arc(0, 0, radius, 0, 2*Math.PI);
+                      ctx.fillStyle = 'white';
+                      ctx.fill();
+                      grad = ctx.createRadialGradient(0,0,radius*0.95, 0,0,radius*1.05);
+                      grad.addColorStop(0, '#333');
+                      grad.addColorStop(0.5, 'white');
+                      grad.addColorStop(1, '#333');
+                      ctx.strokeStyle = grad;
+                      ctx.lineWidth = radius*0.1;
+                      ctx.stroke();
+                      ctx.beginPath();
+                      ctx.arc(0, 0, radius*0.1, 0, 2*Math.PI);
+                      ctx.fillStyle = '#333';
+                      ctx.fill();
+                    }
+
+                    function drawNumbers(ctx, radius) {
+                      var ang;
+                      var num;
+                      ctx.font = radius*0.15 + "px arial";
+                      ctx.textBaseline="middle";
+                      ctx.textAlign="center";
+                      for(num = 1; num < 13; num++){
+                        ang = num * Math.PI / 6;
+                        ctx.rotate(ang);
+                        ctx.translate(0, -radius*0.85);
+                        ctx.rotate(-ang);
+                        ctx.fillText(num.toString(), 0, 0);
+                        ctx.rotate(ang);
+                        ctx.translate(0, radius*0.85);
+                        ctx.rotate(-ang);
                       }
+                    }
 
-                      function drawFace(ctx, radius) {
-                        var grad;
-                        ctx.beginPath();
-                        ctx.arc(0, 0, radius, 0, 2*Math.PI);
-                        ctx.fillStyle = 'white';
-                        ctx.fill();
-                        grad = ctx.createRadialGradient(0,0,radius*0.95, 0,0,radius*1.05);
-                        grad.addColorStop(0, '#333');
-                        grad.addColorStop(0.5, 'white');
-                        grad.addColorStop(1, '#333');
-                        ctx.strokeStyle = grad;
-                        ctx.lineWidth = radius*0.1;
-                        ctx.stroke();
-                        ctx.beginPath();
-                        ctx.arc(0, 0, radius*0.1, 0, 2*Math.PI);
-                        ctx.fillStyle = '#333';
-                        ctx.fill();
-                      }
+                    function drawTime(ctx, radius){
+                      var now = new Date();
+                      var hour = now.getHours();
+                      var minute = now.getMinutes();
+                      var second = now.getSeconds();
+                      //hour
+                      hour=hour%12;
+                      hour=(hour*Math.PI/6)+
+                      (minute*Math.PI/(6*60))+
+                      (second*Math.PI/(360*60));
+                      drawHand(ctx, hour, radius*0.5, radius*0.07);
+                      //minute
+                      minute=(minute*Math.PI/30)+(second*Math.PI/(30*60));
+                      drawHand(ctx, minute, radius*0.8, radius*0.07);
+                      // second
+                      second=(second*Math.PI/30);
+                      drawHand(ctx, second, radius*0.9, radius*0.02);
+                    }
 
-                      function drawNumbers(ctx, radius) {
-                        var ang;
-                        var num;
-                        ctx.font = radius*0.15 + "px arial";
-                        ctx.textBaseline="middle";
-                        ctx.textAlign="center";
-                        for(num = 1; num < 13; num++){
-                          ang = num * Math.PI / 6;
-                          ctx.rotate(ang);
-                          ctx.translate(0, -radius*0.85);
-                          ctx.rotate(-ang);
-                          ctx.fillText(num.toString(), 0, 0);
-                          ctx.rotate(ang);
-                          ctx.translate(0, radius*0.85);
-                          ctx.rotate(-ang);
-                        }
-                      }
+                    function drawHand(ctx, pos, length, width) {
+                      ctx.beginPath();
+                      ctx.lineWidth = width;
+                      ctx.lineCap = "round";
+                      ctx.moveTo(0,0);
+                      ctx.rotate(pos);
+                      ctx.lineTo(0, -length);
+                      ctx.stroke();
+                      ctx.rotate(-pos);
+                    }
+                    </script>
 
-                      function drawTime(ctx, radius){
-                        var now = new Date();
-                        var hour = now.getHours();
-                        var minute = now.getMinutes();
-                        var second = now.getSeconds();
-                        //hour
-                        hour=hour%12;
-                        hour=(hour*Math.PI/6)+
-                        (minute*Math.PI/(6*60))+
-                        (second*Math.PI/(360*60));
-                        drawHand(ctx, hour, radius*0.5, radius*0.07);
-                        //minute
-                        minute=(minute*Math.PI/30)+(second*Math.PI/(30*60));
-                        drawHand(ctx, minute, radius*0.8, radius*0.07);
-                        // second
-                        second=(second*Math.PI/30);
-                        drawHand(ctx, second, radius*0.9, radius*0.02);
-                      }
+                    <br>
+                    <br>
 
-                      function drawHand(ctx, pos, length, width) {
-                        ctx.beginPath();
-                        ctx.lineWidth = width;
-                        ctx.lineCap = "round";
-                        ctx.moveTo(0,0);
-                        ctx.rotate(pos);
-                        ctx.lineTo(0, -length);
-                        ctx.stroke();
-                        ctx.rotate(-pos);
-                      }
-                      </script>
-                      <br>
-                      <br>
+                    <h1 id="map_description"> Send an email! </h1>
+                    <button onclick="sendEmail()" name="send an email" class="btns">Click me to send an email</button>
+                    <style>
+                    .btns {
+                      background: #3498db;
+                      background-image: -webkit-linear-gradient(top, #3498db, #2980b9);
+                      background-image: -moz-linear-gradient(top, #3498db, #2980b9);
+                      background-image: -ms-linear-gradient(top, #3498db, #2980b9);
+                      background-image: -o-linear-gradient(top, #3498db, #2980b9);
+                      background-image: linear-gradient(to bottom, #3498db, #2980b9);
+                      -webkit-border-radius: 28;
+                      -moz-border-radius: 28;
+                      border-radius: 28px;
+                      font-family: Georgia;
+                      color: #00ffb7;
+                      font-size: 20px;
+                      padding: 10px 20px 10px 20px;
+                      text-decoration: none;
+                    }
+
+                    .btns:hover {
+                      background: #3cb0fd;
+                      background-image: -webkit-linear-gradient(top, #3cb0fd, #3498db);
+                      background-image: -moz-linear-gradient(top, #3cb0fd, #3498db);
+                      background-image: -ms-linear-gradient(top, #3cb0fd, #3498db);
+                      background-image: -o-linear-gradient(top, #3cb0fd, #3498db);
+                      background-image: linear-gradient(to bottom, #3cb0fd, #3498db);
+                      text-decoration: none;
+                      }</style>
                       <!-- map starts now! -->
+                      <br>
+                      <br>
+                      <br>
                       <h3 id="map_description">Here is a map of your location:</h3>
                       <div id="map"></div>
                       <script>
@@ -374,71 +414,68 @@ include 'PHP_Binding_0_1/wa_wrapper/WolframAlphaEngine.php';
                       </script>
 
 
-                    <!-- About Section -->
-                    <section id="about" class="container content-section text-center">
-                    <div class="row">
-                    <div class="col-lg-8 col-lg-offset-2">
-                    <h2 class="heads">About Neo</h2>
-                    <style>
-                    .heads {
-                      font-weight: 900;
-                      color: red;
-                    }
-                    </style>
-                    <p id="llist"> Neo is a virtual assistant made mainly using the following API's:
-                    <ul id="llist">
-                    <li> Wolfram Alpha API </li>
-                    <li> Google maps </li>
-                    <li> Google calender </li>
-                    <li> Wunderground </li>
-                    <li> Google mail </li>
-                    <li> Google speech recognition </li>
-                    <li> Google Play Store </li>
+                      <!-- About Section -->
+                      <section id="about" class="container content-section text-center">
+                        <div class="row">
+                          <div class="col-lg-8 col-lg-offset-2">
+                            <h2 class="heads">About Neo</h2>
+                            <style>
+                            .heads {
+                              font-weight: 900;
+                              color: red;
+                            }
+                            </style>
+                            <p id="llist"> Neo is a virtual assistant made mainly using the following API's:
+                              <ul id="llist">
+                                <li> Wolfram Alpha API </li>
+                                <li> Google maps </li>
+                                <li> Google calender </li>
+                                <li> Google mail </li>
+                                <li> Google speech recognition </li>
+                              </ul>
+                              <style type = "text/css">
+                              #llist {
+                                color: green;
+                                font-size: 2em;
+                              }
+                              </style>
+                            </p>
+                          </div>
+                        </div>
+                      </section>
 
-                    </ul>
-                    <style type = "text/css">
-                    #llist {
-                      color: green;
-                      font-size: 2em;
-                    }
-                    </style>
-                    </p>
-                    </div>
-                    </div>
-                    </section>
+                      <!-- Download Section -->
+                      <section id="download" class="content-section text-center">
+                        <div class="download-section">
+                          <div class="container">
+                            <div class="col-lg-8 col-lg-offset-2">
+                              <h2>Download Neo</h2>
+                              <p>You can download Neo from Github. All you have to do is clone it from https://github.com/rocka0/neo</p>
+                              <a href="https://www.github.com/rocka0/Neo" class="btn btn-default btn-lg">Click here to download</a>
+                            </div>
+                          </div>
+                        </div>
+                      </section>
 
-                    <!-- Download Section -->
-                    <section id="download" class="content-section text-center">
-                    <div class="download-section">
-                    <div class="container">
-                    <div class="col-lg-8 col-lg-offset-2">
-                    <h2>Download Neo</h2>
-                    <p>You can download Neo from Github. All you have to do is clone it from https://github.com/rocka0/neo</p>
-                    <a href="https://www.github.com/rocka0/Neo" class="btn btn-default btn-lg">Click here to download</a>
-                    </div>
-                    </div>
-                    </div>
-                    </section>
+                      <!-- Footer -->
+                      <footer>
+                        <div class="container text-center">
+                          <p>Developed by Joshua, Tushar and Sahil</p>
+                        </div>
+                      </footer>
 
-                    <!-- Footer -->
-                    <footer>
-                    <div class="container text-center">
-                    <p>Developed by Joshua, Tushar and Sahil</p>
-                    </div>
-                    </footer>
+                      <!-- jQuery -->
+                      <script src="js/jquery.js"></script>
 
-                    <!-- jQuery -->
-                    <script src="js/jquery.js"></script>
+                      <!-- Bootstrap Core JavaScript -->
+                      <script src="js/bootstrap.min.js"></script>
 
-                    <!-- Bootstrap Core JavaScript -->
-                    <script src="js/bootstrap.min.js"></script>
-
-                    <!-- Plugin JavaScript -->
-                    <script src="js/jquery.easing.min.js"></script>
-                    <!-- Custom Theme JavaScript -->
-                    <script src="js/grayscale.js"></script>
-                    <!--
-                    <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBnFZBVB1kUzASIcp6CqchP2S3PXCaLPH0">
+                      <!-- Plugin JavaScript -->
+                      <script src="js/jquery.easing.min.js"></script>
+                      <!-- Custom Theme JavaScript -->
+                      <script src="js/grayscale.js"></script>
+                      <!--
+                      <script type="text/javascript" src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBnFZBVB1kUzASIcp6CqchP2S3PXCaLPH0">
                     -->
                     <!-- App JavaScript -->
                     <script src="js/app.js"></script>
@@ -450,6 +487,6 @@ include 'PHP_Binding_0_1/wa_wrapper/WolframAlphaEngine.php';
 
 
 
-                    </body>
+                  </body>
 
-                    </html>
+                  </html>
